@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+
+<!-- - - - - - - -B A S E  L I N K - - - - - - -->
+<robot name="uma_grover"> 
+  <!-- A dummy link to avoid KDL error  -->
+  <link name="base_link"/>
+  <joint name="dummy joint" type="fixed">
+    <origin rpy="0 0 1.5708" xyz="0.31 -0.31 0.1"/>
+    <parent link="base_link"/>
+    <child  link="chassis_link"/>
+  </joint>
+
+
+<!-- - - - - - - -C H A S S I S   L I N K - - - - - - -->
+  <link
+    name="chassis_link">
+    <inertial>
+      <origin
+        xyz="0.31559 0.47833 0.020331"
+        rpy="0 0 0" />
+      <mass
+        value="13.426" />
+      <inertia
+        ixx="0.66915"
+        ixy="-0.00029562"
+        ixz="0.00025707"
+        iyy="0.45433"
+        iyz="0.028588"
+        izz="1.0116" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <gazebo reference="chassis_link"> 
+      <material>Gazebo/Gold</material>
+  </gazebo>
+  
+  <!-- - - - - - - -footprint para gps- - - - - - - -->
+  <!-- <link name="base_footprint">
+    <inertial>
+      <mass value="0.0001" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="0.001 0.001 0.001" />
+        </geometry>
+    </visual>
+  </link>  -->
+
+
+      
+
+
+   <!-- - - - - - - -R T K- - - - - - - -->
+    <link name="rtk_Link">
+        <inertial>
+            <origin xyz="0.021466 -0.0067342 0.0175" rpy="0 0 0" />
+            <mass value="0.020772" />
+            <inertia ixx="2.2848E-06" ixy="-1.2777E-07" ixz="3.1102E-12" iyy="5.2015E-06" iyz="7.4023E-13" izz="3.5958E-06" />
+        </inertial>
+
+        <visual>
+            <origin xyz="0 0 0" rpy="-1.5708 0 0" />
+            <geometry>
+            <mesh filename="package://uma_grover/meshes/rtk_Link.STL" />
+            </geometry>
+            <material name="white">
+            <color rgba="1 1 1 1" />
+          </material>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 1.5708" />
+            <geometry>
+            <mesh filename="package://uma_grover/meshes/rtk_Link.STL" />
+            </geometry>
+        </collision>
+    </link>
+
+    <gazebo reference="rtk_Link"> <!--Color for the link -->
+        <turnGravityOff>false</turnGravityOff>
+        <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <!-- joint to attach the gps to the base_lase_link -->
+  <joint name="rtk_joint" type="fixed">
+    <origin xyz="0.1025 0.088 0.47318" rpy="0 0 -1.5708" />
+    <parent link="chassis_link" />
+    <child link="rtk_Link" />
+    <axis xyz="0 0 0" />
+  </joint>
+   
+  <gazebo>
+    <plugin name="novatel_gps_sim" filename="libhector_gazebo_ros_gps.so">
+    <!-- To use this plugin you ned to have installed http://wiki.ros.org/hector_gazebo_plugins   sudo apt-get install ros-melodic-hector-gazebo-plugins -->
+      <alwaysOn>1</alwaysOn>
+      <updateRate>10.0</updateRate>
+      <bodyName>rtk_Link</bodyName>
+      <topicName>fix</topicName>
+      <velocityTopicName>fix_velocity</velocityTopicName>
+      <drift>0.0 0.0 0.0</drift>
+      <gaussianNoise>0.0 0.0 0.0</gaussianNoise>
+      <velocityDrift>0 0 0</velocityDrift>
+      <velocityGaussianNoise>0.0 0.0 0.0</velocityGaussianNoise>
+      <!-- coordinates for itesm campus will be considered as the 
+            center of gazebo world lat: 20.614414,long:  -100.403293-->
+       <referenceLatitude>20.614414</referenceLatitude>
+       <referenceLongitude>-100.403293</referenceLongitude>
+    </plugin>
+  </gazebo>
+  
+  
+  <!-- - - - - - - -IMU- - - - - - - -->
+   
+   <link name="imu_link">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.25" />
+            <inertia ixx="0.000208333" ixy="0" ixz="0" iyy="0.000208333" iyz="0" izz="0.0003125"/>
+        </inertial>
+
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+            <cylinder radius="0.05" length="0.05"/>
+            </geometry>
+            <material name="white" />
+            <color rgba="1 1 1 1" />
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+            <cylinder radius="0.05" length="0.05"/>
+            </geometry>
+        </collision>
+    </link> 
+    
+    <gazebo reference="imu_link">
+        <turnGravityOff>false</turnGravityOff>
+        <material>Gazebo/Orange</material>
+    </gazebo> 
+
+ <!-- joint to attach the gps to the base_lase_link -->
+  
+  <joint name="imu_joint" type="fixed">
+    <origin xyz="0.31559 0.47833 0.020331" rpy="0 0 0" />
+    <parent link="chassis_link" />
+    <child link="imu_link" />
+    <axis xyz="0 0 0" />
+  </joint> 
+    <!-- Pugin definition starts here -->
+    
+    <gazebo reference="imu_link">
+        <gravity>true</gravity>
+        <sensor name="imu_sensor" type="imu">
+            <always_on>true</always_on>
+            <update_rate>100</update_rate>
+            <visualize>true</visualize>
+            <topic>__default_topic__</topic>
+            <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+                <topicName>imu</topicName>
+                <bodyName>imu_link</bodyName>
+                <updateRateHZ>10.0</updateRateHZ>
+                <gaussianNoise>0.0</gaussianNoise>
+                <xyzOffset>0 0 0</xyzOffset>
+                <rpyOffset>0 0 0</rpyOffset>
+                <frameName>imu_link</frameName>
+                <initialOrientationAsReference>false</initialOrientationAsReference>
+            </plugin>
+            <pose>0 0 0 0 0 0</pose>
+        </sensor>
+    </gazebo> 
+
+  
+
+  <!-- - - - - - - -L I D A R- - - - - - - -->
+  <link
+    name="lidar_Link">
+    <inertial>
+      <origin
+        xyz="-1.0308E-06 0.019482 -0.00063718"
+        rpy="0 0 0" />
+      <mass
+        value="0.16704" />
+      <inertia
+        ixx="6.0869E-05"
+        ixy="-1.4035E-11"
+        ixz="4.272E-09"
+        iyy="0.00011279"
+        iyz="2.286E-08"
+        izz="6.3108E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 -0.03"
+        rpy="1.5708 0 0.67324" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/lidar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/lidar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint
+    name="lidar_joint"
+    type="fixed">
+    <origin
+      xyz="0.31 -0.03 0.045"
+      rpy="0 0 4.71239" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="lidar_Link" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  
+  <gazebo reference="lidar_Link"> 
+      <material>Gazebo/Grey</material>
+  </gazebo>
+  
+   <!-- PLUG IN -->
+   <gazebo reference="lidar_Link">
+    <sensor type="ray" name="head_rplidar">
+      <pose>-1.0308E-06 0.019482 0.05 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>15</update_rate><!--15 hz as the RP lidar-->
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>16000</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.9634954</min_angle>
+            <max_angle>1.9634954</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.055</min>
+          <max>25.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>/base_scan</topicName>
+        <frameName>lidar_Link</frameName>
+      </plugin>
+    </sensor>
+   </gazebo>
+
+  
+  
+  <!-- - - - - - - -C A M E R A- - - - - - - -->
+  <link
+    name="camera_Link">
+    <inertial>
+      <origin
+        xyz="-5.2097E-07 4.3931E-06 0.015472"
+        rpy="0 0 0" />
+      <mass
+        value="0.15269" />
+      <inertia
+        ixx="2.2826E-05"
+        ixy="1.0933E-12"
+        ixz="1.2627E-09"
+        iyy="0.00037615"
+        iyz="-2.3463E-09"
+        izz="0.00037417" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="-5.2097E-07 4.3931E-06 0.00015472"
+        rpy="1.5707963268 0 1.5707963268" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/camera_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/camera_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint
+    name="camera_joint"
+    type="fixed">
+    <origin 
+      xyz="0.31 0.02050 0.18549"
+      rpy="6.28319 0 4.71239" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="camera_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <gazebo reference="camera_Link"> <!--Color for the link -->
+      <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <!-- Transmission camera -->
+  <transmission name="camera1_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="camera_joint">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_camera">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <!-- Plugin for the camera -->
+   <gazebo reference="camera_Link">
+    <sensor type="camera" name="camera">
+      <update_rate>15.0</update_rate>
+      <camera name="camera">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>2208</width>
+          <height>1242</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera1_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>uma_robot/camera1</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera_Link</frameName>
+        <hackBaseline>0.0</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+ 
+  <!-- - - - - - - -Front Right Wheel- - - - - - - -->
+  <link
+    name="wfr_Link">
+    <inertial>
+      <origin
+        xyz="-1.3865E-10 -3.3016E-11 0.031947"
+        rpy="0 0 0" />
+      <mass
+        value="2.7527" />
+      <inertia
+        ixx="0.023548"
+        ixy="-1.2444E-11"
+        ixz="1.4726E-11"
+        iyy="0.023548"
+        iyz="2.9649E-12"
+        izz="0.045774" />
+    </inertial>
+    <surface>
+      <friction>
+        <ode>
+          <mu>0.03</mu>
+          <mu2>0.03</mu2>
+        </ode>
+      </friction>
+    </surface>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wfr_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wfr_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint
+    name="wfr_joint"
+    type="continuous">
+    <origin
+      xyz="0.015 0.175 -0.318"
+      rpy="-1.5708 1.1054 -1.5708" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="wfr_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <gazebo reference="wfr_Link"> <!--Color for the link -->
+      <material>Gazebo/Black</material>
+  </gazebo>
+  
+   <!-- - - - - - - -Front Left Wheel- - - - - - - -->
+  <link
+    name="wfl_Link">
+    <inertial>
+      <origin
+        xyz="-1.34571326304567E-10 -3.09736680748074E-11 -0.0342534298973123"
+        rpy="0 0 0" />
+      <mass
+        value="2.75271056507197" />
+      <inertia
+        ixx="0.0235478041938839"
+        ixy="-1.2155146247167E-11"
+        ixz="1.47982060786702E-11"
+        iyy="0.0235478042081284"
+        iyz="3.10652450880572E-12"
+        izz="0.0457737759766504" />
+    </inertial>
+    <surface>
+       <friction>
+         <ode>
+           <mu>0.03</mu>
+           <mu2>0.03</mu2>
+         </ode>
+       </friction>
+     </surface>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wfl_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wfl_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint
+    name="wfl_joint"
+    type="continuous">
+    <origin
+      xyz="0.5388 0.175 -0.318"
+      rpy="1.5708 0.27909 -1.5708" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="wfl_Link" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <gazebo reference="wfl_Link"> <!--Color for the link -->
+      <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <!-- - - - - - - -Back Right Wheel- - - - - - - -->
+  <link
+    name="wbr_Link">
+    <inertial>
+      <origin
+        xyz="-1.35008892954147E-10 -3.01970670690821E-11 0.0319465707453435"
+        rpy="0 0 0" />
+      <mass
+        value="2.75271056498788" />
+      <inertia
+        ixx="0.0235478041937481"
+        ixy="-1.18664951996583E-11"
+        ixz="1.48698552739228E-11"
+        iyy="0.0235478042078551"
+        iyz="3.24809109605935E-12"
+        izz="0.045773775976206" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wbr_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wbr_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint
+    name="wbr_joint"
+    type="continuous">
+    <origin
+      xyz="0.015 0.765 -0.318"
+      rpy="1.5708 0.33457 1.5708" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="wbr_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <gazebo reference="wbr_Link"> <!--Color for the link -->
+      <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <!-- - - - - - - -Back Left Wheel- - - - - - - -->
+  <link
+    name="wbl_Link">
+    <inertial>
+      <origin
+        xyz="-1.3682099897494E-10 -2.93262636397174E-11 -0.0342534294085115"
+        rpy="0 0 0" />
+      <mass
+        value="2.75271056490378" />
+      <inertia
+        ixx="0.0235478041937591"
+        ixy="-1.20703870889246E-11"
+        ixz="1.47113843136334E-11"
+        iyy="0.0235478042074349"
+        iyz="3.2394094459067E-12"
+        izz="0.0457737759757616" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wbl_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://uma_grover/meshes/wbl_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint
+    name="wbl_joint"
+    type="continuous">
+    <origin
+      xyz="0.5388 0.765 -0.318"
+      rpy="-1.5708 0.012365 1.5708" />
+    <parent
+      link="chassis_link" />
+    <child
+      link="wbl_Link" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <gazebo reference="wbl_Link"> 
+      <material>Gazebo/Black</material>
+  </gazebo>
+  
+  
+  <gazebo>
+     <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+       <updateRate>100.0</updateRate>
+       <robotNamespace>/</robotNamespace>
+       <leftFrontJoint>wfl_joint</leftFrontJoint>
+       <rightFrontJoint>wfr_joint</rightFrontJoint>
+       <leftRearJoint>wbl_joint</leftRearJoint>
+       <rightRearJoint>wbr_joint</rightRearJoint>
+       <wheelSeparation>0.46935</wheelSeparation>
+       <wheelDiameter>0.3175</wheelDiameter>
+       <publishWheelTF>true</publishWheelTF>
+       <robotBaseFrame>base_footprint</robotBaseFrame>
+       <torque>80</torque>
+       <topicName>cmd_vel</topicName>
+       <commandTopic>cmd_vel</commandTopic>
+       <odometryTopic>odom</odometryTopic>
+       <odometryFrame>odom</odometryFrame>
+       <broadcastTF>true</broadcastTF>
+       <covariance_x>0.000100</covariance_x>
+       <covariance_y>0.000100</covariance_y>
+       <covariance_yaw>0.1000</covariance_yaw>
+     </plugin>
+  </gazebo>
+  
+</robot>
